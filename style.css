@@ -1,0 +1,387 @@
+/* ==========================================================================
+   style.css — TDX PvP Draft (рассчитан на ПК 1920×1080)
+   Секции:
+     1. Переменные и тема
+     2. Общий layout
+     3. Lobby (шапка команды, места)
+     4. Wheel draft
+     5. Auction draft (зарезервировано)
+     6. Pools and decks
+     7. Responsive rules
+     8. Modal / dialog (+ toast)
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. ПЕРЕМЕННЫЕ И ТЕМА
+   ========================================================================== */
+:root {
+  --bg: #0b0f16;
+  --panel: #131a26;
+  --panel-2: #1b2535;
+  --line: #2a3650;
+  --text: #e9eef7;
+  --muted: #8794ab;
+
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --gold: #f5c542;
+  --ok: #34d399;
+  --warn: #f59e0b;
+
+  --radius: 10px;
+  --card-h: 50px;          /* высота карточки башни в пуле и колоде */
+  --topbar-h: 42px;
+  --font: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+
+/* ==========================================================================
+   2. ОБЩИЙ LAYOUT
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overflow: hidden;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: var(--topbar-h) minmax(0, 1fr);
+  height: 100vh;
+  min-width: 1600px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 16px;
+  background: #0f1520;
+  border-bottom: 1px solid var(--line);
+}
+.topbar-title { font-weight: 700; letter-spacing: .5px; }
+.topbar-status { flex: 1; color: var(--muted); font-size: 14px; }
+
+/* Две равные половины */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+}
+
+.half {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  padding: 6px 14px 8px;
+  border-top: 4px solid var(--team);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--team) 10%, var(--panel)) 0%, var(--panel) 40%);
+}
+.half--blue { --team: var(--blue); }
+.half--red  { --team: var(--red); border-left: 2px solid var(--line); }
+
+/* Кнопки */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: filter .15s, transform .05s;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.2); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn--ghost { background: transparent; }
+.btn--small { padding: 5px 12px; font-size: 13px; }
+.btn--primary { background: var(--team, var(--blue)); border-color: transparent; }
+.btn--ok { background: #12805c; border-color: transparent; }
+.btn[hidden] { display: none; }
+
+
+/* ==========================================================================
+   3. LOBBY — шапка команды и места
+   ========================================================================== */
+.half-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 40px;
+}
+.team-name {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--team);
+  text-transform: uppercase;
+}
+.seat-status {
+  flex: 1;
+  font-size: 14px;
+  color: var(--muted);
+}
+.seat-status--me { color: var(--ok); font-weight: 600; }
+.seat-status--taken { color: var(--warn); }
+.half-header-actions { display: flex; gap: 8px; }
+.btn--claim { background: var(--team); border-color: transparent; }
+
+
+/* ==========================================================================
+   4. WHEEL DRAFT
+   ========================================================================== */
+/* Колесо занимает ~90% ширины своей половины */
+.wheel-wrap {
+  position: relative;
+  width: 96%;
+  margin: 0 auto;
+}
+.wheel-canvas {
+  display: block;
+  width: 100%;       /* высоту выставляет app.js по ширине (полукруг + корпус) */
+}
+
+.wheel-caption {
+  position: absolute;
+  bottom: 6px;
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 28%;
+}
+.wheel-caption--left  { left: 4px; }
+.wheel-caption--right { right: 4px; text-align: right; color: var(--gold); font-weight: 600; }
+
+/* Кнопка вращения — по центру корпуса колеса */
+.btn--spin {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 52px;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: #2a1d00;
+  background: linear-gradient(180deg, #ffe27a, #f0a500);
+  border: 2px solid #fff3c4;
+  border-radius: 28px;
+  box-shadow: 0 0 18px rgba(245, 197, 66, .55);
+}
+.btn--spin:active:not(:disabled) { transform: translateX(-50%) translateY(1px); }
+.btn--spin:disabled {
+  color: var(--muted);
+  background: #232c3d;
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+
+/* ==========================================================================
+   5. AUCTION DRAFT (зарезервировано под следующие режимы)
+   Сюда добавятся стили аукциона: ставки, таймер, лот.
+   ========================================================================== */
+/* Переключатель режимов в шапке (Auction Draft пока без действия) */
+.mode-switch { display: flex; gap: 6px; }
+.mode-btn {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 5px 14px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.mode-btn:hover { color: var(--text); }
+.mode-btn--active { color: #2a1d00; background: var(--gold); border-color: var(--gold); cursor: default; }
+.auction-placeholder { display: none; }
+
+
+/* ==========================================================================
+   6. POOLS AND DECKS
+   ========================================================================== */
+.block { display: flex; flex-direction: column; gap: 4px; }
+.block-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.pool {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.deck {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--card-h);
+  padding: 0 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  position: relative;
+}
+.card-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card--empty {
+  justify-content: center;
+  color: #3b4760;
+  border-style: dashed;
+  background: transparent;
+  font-weight: 400;
+}
+.card--clickable { cursor: pointer; }
+.card--clickable:hover { border-color: var(--team); }
+.card--in-deck { border-color: var(--team); box-shadow: inset 0 0 0 1px var(--team); }
+.card--gift { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+.card--secret { background: #2a2140; border-color: #6d4fd0; }
+.card--new { animation: card-pop .5s ease-out; }
+@keyframes card-pop {
+  from { transform: scale(.6); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 12px;
+}
+
+.tower-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .85);
+  color: #fff;
+  font-weight: 800;
+  overflow: hidden;
+}
+.tower-icon-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Нижняя строка действий: подлянка слева, подтверждение справа */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, .22);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.actions-info { flex: 1; font-size: 14px; color: var(--muted); }
+.actions-info b { color: var(--text); }
+.gift-row { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+.gift-row .card { min-width: 170px; }
+
+
+/* ==========================================================================
+   7. RESPONSIVE RULES
+   Сайт только для ПК; эти правила лишь подстраховывают окно браузера
+   меньше, чем полный 1920×1080 (панели браузера съедают высоту).
+   ========================================================================== */
+@media (max-height: 1000px) {
+  :root { --card-h: 44px; }
+  .team-name { font-size: 24px; }
+  .btn--spin { height: 46px; font-size: 20px; }
+}
+@media (max-height: 900px) {
+  :root { --card-h: 38px; }
+  .card { font-size: 13px; }
+  .actions { min-height: 48px; }
+}
+@media (max-width: 1750px) {
+  .team-name { font-size: 22px; }
+  .card { font-size: 13px; }
+}
+
+
+/* ==========================================================================
+   8. MODAL / DIALOG (+ toast)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 6, 12, .72);
+}
+.modal {
+  width: 560px;
+  max-width: 90vw;
+  padding: 22px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+}
+.modal h3 { margin: 0 0 10px; font-size: 20px; }
+.modal p { margin: 0 0 14px; color: var(--muted); line-height: 1.45; }
+.modal-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Оверлей подключения / ошибки связи */
+.conn-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  background: rgba(8, 11, 18, .92);
+}
+.conn-overlay--error { color: #ff8a80; }
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 10px 18px;
+  background: #0b0f16;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+#toast.visible { opacity: 1; }
