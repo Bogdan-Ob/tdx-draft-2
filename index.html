@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>TDX PvP Draft</title>
+  <meta name="viewport" content="width=1920">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Тонкая верхняя полоса: только самое нужное -->
+    <header class="topbar">
+      <div class="topbar-title">TDX · PvP Draft</div>
+      <!-- Переключатель режимов (режим общий для обоих игроков) -->
+      <nav class="mode-switch">
+        <button class="mode-btn" data-mode="wheel">Wheel Draft</button>
+        <button class="mode-btn" data-mode="auction">Auction Draft</button>
+      </nav>
+      <!-- Опция Wheel Draft: EDJ бесплатна (9 вращений вместо 10) -->
+      <button class="mode-btn" id="btn-edj" hidden></button>
+      <div class="topbar-status" id="topbar-status"></div>
+      <button class="btn btn--ghost btn--small" id="btn-reset">Сбросить драфт</button>
+    </header>
+
+    <!-- Две равные половины: Blue слева, Red справа (создаются из шаблона в app.js) -->
+    <main class="workspace" id="workspace"></main>
+  </div>
+
+  <!-- Шаблон одной половины (одинаковый для Blue и Red) -->
+  <template id="half-template">
+    <section class="half">
+      <header class="half-header">
+        <h2 class="team-name"></h2>
+        <span class="seat-status"></span>
+        <div class="half-header-actions">
+          <button class="btn btn--claim"></button>
+          <button class="btn btn--ghost btn--leave">Освободить</button>
+        </div>
+      </header>
+
+      <div class="wheel-wrap">
+        <canvas class="wheel-canvas"></canvas>
+        <div class="wheel-caption wheel-caption--left"></div>
+        <div class="wheel-caption wheel-caption--right"></div>
+        <button class="btn btn--spin">ВРАЩАТЬ</button>
+      </div>
+
+      <div class="block">
+        <div class="block-title"><span>Пул башен</span><span class="pool-count"></span></div>
+        <div class="pool"></div>
+      </div>
+
+      <div class="block">
+        <div class="block-title"><span>Итоговая колода</span><span class="deck-count"></span></div>
+        <div class="deck"></div>
+      </div>
+
+      <div class="actions"></div>
+    </section>
+  </template>
+
+  <!-- Шаблон половины режима Auction Draft -->
+  <template id="auction-half-template">
+    <section class="half half--auction">
+      <header class="half-header">
+        <h2 class="team-name"></h2>
+        <span class="seat-status"></span>
+        <div class="budget-chip" title="Оставшийся бюджет"><span class="budget-label">Бюджет</span><span class="budget-value"></span></div>
+        <div class="half-header-actions">
+          <button class="btn btn--claim"></button>
+          <button class="btn btn--ghost btn--leave">Освободить</button>
+        </div>
+      </header>
+
+      <div class="bid-panel">
+        <div class="bid-title"></div>
+        <div class="bid-row">
+          <label class="bid-input-wrap"><span class="bid-currency">$</span><input class="bid-input" type="number" min="1" step="1" inputmode="numeric" autocomplete="off"></label>
+          <button class="btn btn--bid">Сделать ставку</button>
+          <button class="btn btn--pass">Пасс</button>
+        </div>
+        <div class="bid-hint"></div>
+      </div>
+
+      <!-- Колода собирается сама: EDJ + выигранные башни -->
+      <div class="block block--deck">
+        <div class="block-title"><span>Колода</span><span class="deck-count"></span></div>
+        <div class="deck deck--auction"></div>
+      </div>
+    </section>
+  </template>
+
+  <div id="modal-root"></div>
+  <div id="toast"></div>
+
+  <script src="towers.js"></script>
+  <script src="wheel-logic.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="net.js"></script>
+  <script src="auction.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

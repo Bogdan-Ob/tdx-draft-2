@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "tdx-draft": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
